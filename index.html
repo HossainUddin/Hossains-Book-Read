@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PDF Book Reader</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-900 min-h-screen">
+    <!-- HEADER / UPLOAD -->
+    <header class="bg-slate-800 shadow-sm py-6">
+      <div class="max-w-4xl mx-auto px-4">
+        <label
+          for="file-input"
+          class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-indigo-400 rounded-xl cursor-pointer bg-indigo-50 hover:bg-indigo-100 transition"
+        >
+          <svg
+            class="w-10 h-10 text-indigo-500 mb-2"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 16v-8m0 0L8 12m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+            />
+          </svg>
+
+          <p class="text-sm text-black">
+            <span class="font-semibold text-indigo-600">Click to upload</span>
+            or drag PDF here
+          </p>
+          <p class="text-xs text-black mt-1">PDF files only</p>
+
+          <input
+            type="file"
+            id="file-input"
+            accept="application/pdf"
+            class="hidden"
+          />
+        </label>
+
+        <p id="file-name" class="mt-2 text-sm text-center text-gray-700"></p>
+      </div>
+    </header>
+
+    <!-- READER -->
+    <main
+      class="max-w-5xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6"
+    >
+      <!-- PDF VIEW -->
+      <div
+        class="lg:col-span-2 bg-slate-800 rounded-xl shadow p-4 flex flex-col items-center"
+      >
+        <div
+          class="bg-slate-800 rounded-lg overflow-hidden w-full flex justify-center"
+        >
+          <canvas id="pdf-render" class="max-w-full"></canvas>
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="flex items-center justify-between w-full mt-4">
+          <button
+            id="prev"
+            class="px-4 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition"
+          >
+            ⟵ Prev
+          </button>
+
+          <span id="page-info" class="text-sm font-medium text-white">
+            0 / 0
+          </span>
+
+          <button
+            id="next"
+            class="px-4 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition"
+          >
+            Next ⟶
+          </button>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="bg-slate-800 rounded-xl shadow p-4 flex flex-col">
+        <h3 class="text-lg font-semibold text-white mb-2">📝 Notes</h3>
+
+        <textarea
+          id="note-area"
+          placeholder="Write notes for this page..."
+          class="flex-1 resize-none rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        ></textarea>
+      </div>
+    </main>
+
+    <footer
+      class="max-w-5xl mx-auto flex justify-center align-center py-2 bg-neutral-700 rounded-xl"
+    >
+      <span class="text-xl">🔗</span>
+      <a
+        class="text-white text-lg underline"
+        href="https://www.facebook.com/HossainUddin0"
+        target="_blank"
+      >
+        Hosasin Uddin Ahamad</a
+      >
+    </footer>
+
+    <!-- SCRIPT -->
+    <script type="module" src="script.js"></script>
+
+    <!-- Filename Preview -->
+    <script>
+      document
+        .getElementById("file-input")
+        .addEventListener("change", function () {
+          if (this.files.length > 0) {
+            document.getElementById("file-name").innerText =
+              "Selected file: " + this.files[0].name;
+          }
+        });
+    </script>
+  </body>
+</html>
