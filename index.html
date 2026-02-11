@@ -2,125 +2,105 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PDF Book Reader</title>
-
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-slate-900 min-h-screen">
-    <!-- HEADER / UPLOAD -->
-    <header class="bg-slate-800 shadow-sm py-6">
-      <div class="max-w-4xl mx-auto px-4">
+  <body class="bg-gradient-to-br from-gray-900 via-slate-900 to-black min-h-screen text-slate-200 font-sans selection:bg-indigo-500/30">
+    
+    <!-- Background Decor -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-violet-600/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="relative z-10 p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-6">
+      
+      <!-- HEADER / UPLOAD -->
+      <header class="glass-panel rounded-2xl p-6 md:p-8 text-center transition-all hover:border-indigo-500/30">
+        <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-400 mb-4">
+          PDF Book Reader
+        </h1>
+        
         <label
           for="file-input"
-          class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-indigo-400 rounded-xl cursor-pointer bg-indigo-50 hover:bg-indigo-100 transition"
+          class="group flex flex-col items-center justify-center w-full max-w-2xl mx-auto h-32 border-2 border-dashed border-slate-600 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-white/5 transition-all duration-300"
         >
-          <svg
-            class="w-10 h-10 text-indigo-500 mb-2"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 16v-8m0 0L8 12m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
-            />
-          </svg>
-
-          <p class="text-sm text-black">
-            <span class="font-semibold text-indigo-600">Click to upload</span>
-            or drag PDF here
-          </p>
-          <p class="text-xs text-black mt-1">PDF files only</p>
-
-          <input
-            type="file"
-            id="file-input"
-            accept="application/pdf"
-            class="hidden"
-          />
+          <div class="flex flex-col items-center pt-5 pb-6">
+            <svg class="w-8 h-8 text-slate-400 group-hover:text-indigo-400 mb-2 transition-colors" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+            </svg>
+            <p class="text-sm text-slate-400"><span class="font-semibold text-indigo-400">Click to upload</span> or drag and drop</p>
+            <p class="text-xs text-slate-500">PDF (MAX. 50MB)</p>
+          </div>
+          <input id="file-input" type="file" class="hidden" accept="application/pdf" />
         </label>
+        <p id="file-name" class="mt-2 text-sm text-indigo-300 h-5"></p>
+      </header>
 
-        <p id="file-name" class="mt-2 text-sm text-center text-gray-700"></p>
-      </div>
-    </header>
+      <!-- MAIN CONTENT -->
+      <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- PDF VIEWER -->
+        <div class="lg:col-span-2 glass-panel rounded-2xl p-1 flex flex-col relative group">
+           
+           <!-- Controls (Top on Mobile, overlay/bottom on Desktop?) -->
+           <div class="flex items-center justify-between p-2 mb-2 bg-black/20 rounded-xl backdrop-blur-sm sticky top-0 z-20">
+              <button id="prev" class="p-2 rounded-lg hover:bg-white/10 text-indigo-300 hover:text-white transition disabled:opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+              </button>
 
-    <!-- READER -->
-    <main
-      class="max-w-5xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6"
-    >
-      <!-- PDF VIEW -->
-      <div
-        class="lg:col-span-2 bg-slate-800 rounded-xl shadow p-4 flex flex-col items-center"
-      >
-        <div
-          class="bg-slate-800 rounded-lg overflow-hidden w-full flex justify-center"
-        >
-          <canvas id="pdf-render" class="max-w-full"></canvas>
+              <span id="page-info" class="font-mono text-sm text-indigo-200">0 / 0</span>
+
+              <button id="next" class="p-2 rounded-lg hover:bg-white/10 text-indigo-300 hover:text-white transition disabled:opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+           </div>
+
+           <!-- PDF Canvas Wrapper -->
+           <div id="pdf-wrapper" class="relative w-full overflow-auto flex justify-center bg-black/40 rounded-xl min-h-[500px]">
+              <div class="relative inline-block m-auto">
+                <canvas id="pdf-render" class="block max-w-full h-auto"></canvas>
+                <div id="text-layer" class="absolute inset-0"></div> <!-- Text Layer -->
+              </div>
+           </div>
         </div>
 
-        <!-- CONTROLS -->
-        <div class="flex items-center justify-between w-full mt-4">
-          <button
-            id="prev"
-            class="px-4 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition"
-          >
-            ⟵ Prev
-          </button>
-
-          <span id="page-info" class="text-sm font-medium text-white">
-            0 / 0
-          </span>
-
-          <button
-            id="next"
-            class="px-4 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition"
-          >
-            Next ⟶
-          </button>
+        <!-- NOTES -->
+        <div class="glass-panel rounded-2xl p-6 flex flex-col h-[500px] lg:h-auto">
+          <h3 class="text-xl font-bold text-indigo-300 mb-4 flex items-center gap-2">
+            <span>📝</span> Notes
+          </h3>
+          <textarea
+            id="note-area"
+            placeholder="Write your thoughts here..."
+            class="flex-1 w-full bg-black/20 border border-slate-700/50 rounded-xl p-4 text-slate-300 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 resize-none transition-all"
+          ></textarea>
         </div>
-      </div>
 
-      <!-- NOTES -->
-      <div class="bg-slate-800 rounded-xl shadow p-4 flex flex-col">
-        <h3 class="text-lg font-semibold text-white mb-2">📝 Notes</h3>
+      </main>
 
-        <textarea
-          id="note-area"
-          placeholder="Write notes for this page..."
-          class="flex-1 resize-none rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        ></textarea>
-      </div>
-    </main>
+      <footer class="mt-8 text-center text-slate-500 text-sm">
+        <p>Built with ❤️ by Hossain Uddin Ahamad</p>
+      </footer>
 
-    <footer
-      class="max-w-5xl mx-auto flex justify-center align-center py-2 bg-neutral-700 rounded-xl"
-    >
-      <span class="text-xl">🔗</span>
-      <a
-        class="text-white text-lg underline"
-        href="https://www.facebook.com/HossainUddin0"
-        target="_blank"
-      >
-        Hosasin Uddin Ahamad</a
-      >
-    </footer>
+    </div>
 
-    <!-- SCRIPT -->
-    <script type="module" src="script.js"></script>
-
-    <!-- Filename Preview -->
+    <!-- MAIN SCRIPT -->
+    <script type="module" src="/src/main.ts"></script>
+    
     <script>
-      document
-        .getElementById("file-input")
-        .addEventListener("change", function () {
-          if (this.files.length > 0) {
-            document.getElementById("file-name").innerText =
-              "Selected file: " + this.files[0].name;
-          }
-        });
+      // Simple preview name change
+      const fileInput = document.getElementById('file-input');
+      const fileNameDisplay = document.getElementById('file-name');
+      fileInput.addEventListener('change', (e) => {
+        if(e.target.files.length > 0) {
+          fileNameDisplay.textContent = e.target.files[0].name;
+        }
+      });
     </script>
   </body>
 </html>

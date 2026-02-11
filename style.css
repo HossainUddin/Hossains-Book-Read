@@ -1,8 +1,0 @@
-#text-layer {
-  pointer-events: auto;
-}
-
-#text-layer span {
-  color: transparent;
-  user-select: text;
-}

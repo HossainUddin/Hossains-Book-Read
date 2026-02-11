@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Book Reader</title>
+    <script type="module" crossorigin src="/assets/index-DEQh98wo.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-C0ONHUFN.css">
+  </head>
+  <body class="bg-gradient-to-br from-gray-900 via-slate-900 to-black min-h-screen text-slate-200 font-sans selection:bg-indigo-500/30">
+    
+    <!-- Background Decor -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-violet-600/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="relative z-10 p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-6">
+      
+      <!-- HEADER / UPLOAD -->
+      <header class="glass-panel rounded-2xl p-6 md:p-8 text-center transition-all hover:border-indigo-500/30">
+        <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-400 mb-4">
+          PDF Book Reader
+        </h1>
+        
+        <label
+          for="file-input"
+          class="group flex flex-col items-center justify-center w-full max-w-2xl mx-auto h-32 border-2 border-dashed border-slate-600 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-white/5 transition-all duration-300"
+        >
+          <div class="flex flex-col items-center pt-5 pb-6">
+            <svg class="w-8 h-8 text-slate-400 group-hover:text-indigo-400 mb-2 transition-colors" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+            </svg>
+            <p class="text-sm text-slate-400"><span class="font-semibold text-indigo-400">Click to upload</span> or drag and drop</p>
+            <p class="text-xs text-slate-500">PDF (MAX. 50MB)</p>
+          </div>
+          <input id="file-input" type="file" class="hidden" accept="application/pdf" />
+        </label>
+        <p id="file-name" class="mt-2 text-sm text-indigo-300 h-5"></p>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- PDF VIEWER -->
+        <div class="lg:col-span-2 glass-panel rounded-2xl p-1 flex flex-col relative group">
+           
+           <!-- Controls (Top on Mobile, overlay/bottom on Desktop?) -->
+           <div class="flex items-center justify-between p-2 mb-2 bg-black/20 rounded-xl backdrop-blur-sm sticky top-0 z-20">
+              <button id="prev" class="p-2 rounded-lg hover:bg-white/10 text-indigo-300 hover:text-white transition disabled:opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+              </button>
+
+              <span id="page-info" class="font-mono text-sm text-indigo-200">0 / 0</span>
+
+              <button id="next" class="p-2 rounded-lg hover:bg-white/10 text-indigo-300 hover:text-white transition disabled:opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+           </div>
+
+           <!-- PDF Canvas Wrapper -->
+           <div id="pdf-wrapper" class="relative w-full overflow-auto flex justify-center bg-black/40 rounded-xl min-h-[500px]">
+              <div class="relative inline-block m-auto">
+                <canvas id="pdf-render" class="block max-w-full h-auto"></canvas>
+                <div id="text-layer" class="absolute inset-0"></div> <!-- Text Layer -->
+              </div>
+           </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="glass-panel rounded-2xl p-6 flex flex-col h-[500px] lg:h-auto">
+          <h3 class="text-xl font-bold text-indigo-300 mb-4 flex items-center gap-2">
+            <span>📝</span> Notes
+          </h3>
+          <textarea
+            id="note-area"
+            placeholder="Write your thoughts here..."
+            class="flex-1 w-full bg-black/20 border border-slate-700/50 rounded-xl p-4 text-slate-300 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 resize-none transition-all"
+          ></textarea>
+        </div>
+
+      </main>
+
+      <footer class="mt-8 text-center text-slate-500 text-sm">
+        <p>Built with ❤️ by Hossain Uddin Ahamad</p>
+      </footer>
+
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    
+    <script>
+      // Simple preview name change
+      const fileInput = document.getElementById('file-input');
+      const fileNameDisplay = document.getElementById('file-name');
+      fileInput.addEventListener('change', (e) => {
+        if(e.target.files.length > 0) {
+          fileNameDisplay.textContent = e.target.files[0].name;
+        }
+      });
+    </script>
+  </body>
+</html>
